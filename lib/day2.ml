@@ -70,9 +70,52 @@ let ans_for_single_range range =
 
 let%test _ = ans_for_single_range (11, 22) = 33
 
-let solve inputdata =
+let parse_ranges inputdata =
   let str_ranges0 = String.split_on_char ',' inputdata in
   let str_ranges1 = List.filter (fun x -> String.length x > 0) str_ranges0 in
-  let ranges = List.map parse_range str_ranges1 in
+  List.map parse_range str_ranges1
+
+let solve inputdata =
+  let ranges = parse_ranges inputdata in
   let ans_list = List.map ans_for_single_range ranges in
   string_of_int @@ List.fold_left Int.add 0 ans_list
+
+let is_in_ranges ranges x =
+  List.exists (fun (lo, hi) -> x >= lo && x <= hi) ranges
+
+let n_digit_numbers n =
+  Seq.take (pow10 n - pow10 (n - 1)) @@ Seq.ints (pow10 (n - 1))
+
+let%test _ = List.of_seq @@ n_digit_numbers 1 = [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ]
+
+let repeat_digits num count =
+  int_of_string
+  @@ String.concat "" (List.init count (fun _ -> string_of_int num))
+
+let digit_reps (size, reps) =
+  Seq.map (fun v -> repeat_digits v reps) @@ n_digit_numbers size
+
+let%test _ =
+  List.of_seq @@ digit_reps (1, 2) = [ 11; 22; 33; 44; 55; 66; 77; 88; 99 ]
+
+let size_range = Seq.take 5 @@ Seq.ints 1
+
+let count_range size =
+  let mx = 10 / size in
+  let seq = Seq.take (mx - 1) @@ Seq.ints 2 in
+  Seq.map (fun x -> (size, x)) seq
+
+let all_ranges = Seq.concat_map count_range size_range
+let all_candidates = Seq.concat_map digit_reps all_ranges
+
+module IntSet = Set.Make (struct
+  type t = int
+
+  let compare = compare
+end)
+
+let solve2 inputdata =
+  let ranges = parse_ranges inputdata in
+  let invalid_ids = Seq.filter (is_in_ranges ranges) all_candidates in
+  let unique_invalid_ids = IntSet.of_seq invalid_ids in
+  string_of_int @@ IntSet.fold Int.add unique_invalid_ids 0
