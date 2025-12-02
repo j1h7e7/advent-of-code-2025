@@ -12,5 +12,5 @@ ew:
 tw:
     dune test -w
 
-run day='0' test='':
-    dune exec advent-of-code {{day}} {{test}} -w
+run day='0' part='1' test='':
+    dune exec advent-of-code {{day}} {{part}} {{test}} -w
