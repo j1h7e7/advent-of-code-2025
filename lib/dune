@@ -1,2 +1,5 @@
 (library
- (name advent_of_code))
+ (name advent_of_code)
+ (inline_tests)
+ (preprocess
+  (pps ppx_inline_test)))
