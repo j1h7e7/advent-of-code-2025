@@ -1,3 +1,5 @@
+open Utils
+
 let parse_rating line =
   line |> String.trim |> String.to_seq
   |> Seq.map (String.make 1)
@@ -42,8 +44,37 @@ let%test _ = get_best_joltage [ 9; 8; 7 ] = 98
 let%test _ = get_best_joltage [ 9; 7; 8 ] = 98
 let%test _ = get_best_joltage [ 8; 7; 9 ] = 89
 
-let solve inputdata =
+let parse_ranges inputdata =
   let lines = String.split_on_char '\n' inputdata in
-  let ratings = List.map parse_rating lines in
+  List.map parse_rating lines
+
+let solve inputdata =
+  let ratings = parse_ranges inputdata in
   let joltages = List.map get_best_joltage ratings in
   string_of_int @@ List.fold_left Int.add 0 joltages
+
+let get_first_max_rating2 ratings trim =
+  let ratings_trim = List.take (List.length ratings - trim) ratings in
+  let ris = List.mapi (fun i r -> (r, i)) ratings_trim in
+  let best = List.fold_left compare_ris (0, 0) ris in
+  best
+
+let rec get_joltage_step ratings n =
+  match n with
+  | 0 -> 0
+  | x -> begin
+      let r, i = get_first_max_rating2 ratings (x - 1) in
+      let newratings = List.drop (i + 1) ratings in
+      let m = get_joltage_step newratings (n - 1) in
+      (r * pow10 (n - 1)) + m
+    end
+
+let%test _ = get_joltage_step [ 9; 5; 1 ] 2 = 95
+let%test _ = get_joltage_step [ 9; 1; 5 ] 2 = 95
+let%test _ = get_joltage_step [ 1; 9; 5 ] 2 = 95
+let%test _ = get_joltage_step [ 9; 1; 5 ] 3 = 915
+
+let solve2 inputdata =
+  let ratings = parse_ranges inputdata in
+  let joltages = List.map (Fun.flip get_joltage_step 12) ratings in
+  string_of_int @@ sum joltages

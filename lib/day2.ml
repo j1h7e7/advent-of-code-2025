@@ -1,4 +1,4 @@
-let rec pow10 pow = match pow with 0 -> 1 | n -> 10 * pow10 (n - 1)
+open Utils
 
 let parse_range range =
   let ranges = String.split_on_char '-' @@ String.trim range in
