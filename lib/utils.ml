@@ -4,3 +4,5 @@ let sum nums = List.fold_left Int.add 0 nums
 let splitlines str =
   str |> String.split_on_char '\n'
   |> List.filter (fun x -> String.length @@ String.trim x > 0)
+
+let list_filter_mapi fn list = List.filter_map (fun x -> x) @@ List.mapi fn list

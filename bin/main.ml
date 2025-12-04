@@ -20,6 +20,7 @@ let solver : string -> string =
   | 3, 1 -> Advent_of_code.Day3.solve
   | 3, 2 -> Advent_of_code.Day3.solve2
   | 4, 1 -> Advent_of_code.Day4.solve
+  | 4, 2 -> Advent_of_code.Day4.solve2
   | _ -> fun _ -> "N/A"
 
 let answer = solver data
