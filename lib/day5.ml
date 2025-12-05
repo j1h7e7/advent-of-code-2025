@@ -29,3 +29,33 @@ let solve input_data =
   let ranges, ids = parse_ranges_and_ids input_data in
   let in_ranges = List.map (is_in_ranges ranges) ids in
   string_of_int @@ sum @@ List.map (fun x -> if x then 1 else 0) in_ranges
+
+let rec combine_ranges in_ranges out_ranges =
+  match (in_ranges, out_ranges) with
+  | [], y -> y
+  | x :: xs, [] -> combine_ranges xs [ x ]
+  | x :: xs, y :: ys -> begin
+      let x1, x2 = x in
+      let y1, y2 = y in
+      let new_head =
+        if x1 > y2 then [ (x1, x2); (y1, y2) ] else [ (y1, Int.max x2 y2) ]
+      in
+      let new_out_ranges = List.append new_head ys in
+      combine_ranges xs new_out_ranges
+    end
+
+let%test _ = combine_ranges [ (1, 2) ] [] = [ (1, 2) ]
+let%test _ = combine_ranges [ (1, 2); (2, 3) ] [] = [ (1, 3) ]
+let%test _ = combine_ranges [ (1, 3); (2, 4) ] [] = [ (1, 4) ]
+let%test _ = combine_ranges [ (1, 2); (5, 6) ] [] = [ (5, 6); (1, 2) ]
+let range_size (r1, r2) = r2 - r1 + 1
+
+let solve2 input_data =
+  let range_chunk = List.nth (Str.split (Str.regexp "\n\n") input_data) 0 in
+  let ranges =
+    List.sort (fun (x, _) (y, _) -> Stdlib.compare x y)
+    @@ parse_ranges range_chunk
+  in
+  let ranges' = combine_ranges ranges [] in
+  let ans = sum @@ List.map range_size ranges' in
+  string_of_int ans
