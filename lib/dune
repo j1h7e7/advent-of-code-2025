@@ -1,5 +1,6 @@
 (library
  (name advent_of_code)
+ (libraries str)
  (inline_tests)
  (preprocess
   (pps ppx_inline_test)))
