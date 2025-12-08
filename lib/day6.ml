@@ -30,3 +30,43 @@ let solve input_data =
   let cols = parse_data input_data in
   let ans = List.map eval_col cols in
   ans |> sum |> string_of_int
+
+let rec parse_chunk lines active_chunk =
+  match lines with
+  | [] -> [ active_chunk ]
+  | [] :: _ -> [ active_chunk ]
+  | x :: xs when List.for_all (fun c -> c = ' ') x -> begin
+      let res = parse_chunk xs [] in
+      res @ [ active_chunk ]
+    end
+  | x :: xs -> parse_chunk xs (active_chunk @ [ x ])
+
+let chunks_to_vals chunks =
+  List.map
+    (fun line ->
+      int_of_string @@ String.trim @@ String.of_seq @@ List.to_seq line)
+    chunks
+
+let parse_data2 data =
+  let lines = splitlines data in
+  let op_line = lines |> List.rev |> List.hd in
+  let vals = lines |> List.rev |> List.tl |> List.rev in
+  let char_mat =
+    List.map (fun line -> List.of_seq @@ String.to_seq line) vals
+  in
+  let res = parse_chunk (transpose char_mat) [] in
+  let vals' = List.map chunks_to_vals @@ List.rev res in
+  let ops = parse_line op_line in
+  (vals', ops)
+
+let%test _ =
+  parse_data2 "12 34\n5   6\n+  * \n" = ([ [ 15; 2 ]; [ 3; 46 ] ], [ "+"; "*" ])
+
+let solve2 input_data =
+  let vals, ops = parse_data2 input_data in
+  let ans =
+    List.combine ops vals
+    |> List.map (fun (op, v) ->
+        List.fold_left (get_single_op op) (get_start_val op) v)
+  in
+  string_of_int @@ sum ans
