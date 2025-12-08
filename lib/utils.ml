@@ -10,3 +10,5 @@ let list_filter_mapi fn list = List.filter_map (fun x -> x) @@ List.mapi fn list
 let rec transpose = function
   | [] | [] :: _ -> []
   | rows -> List.map List.hd rows :: transpose (List.map List.tl rows)
+
+let str_to_chrs str = List.of_seq @@ String.to_seq str
