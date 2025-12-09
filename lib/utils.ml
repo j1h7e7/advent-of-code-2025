@@ -12,3 +12,11 @@ let rec transpose = function
   | rows -> List.map List.hd rows :: transpose (List.map List.tl rows)
 
 let str_to_chrs str = List.of_seq @@ String.to_seq str
+
+let rec cartesian_product l1 l2 =
+  match (l1, l2) with
+  | [], _ | _, [] -> []
+  | x :: xs, y :: ys ->
+      (x, y)
+      :: (cartesian_product [ x ] ys @ cartesian_product xs [ y ]
+        @ cartesian_product xs ys)
