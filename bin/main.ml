@@ -26,6 +26,7 @@ let solver : string -> string =
   | 6, 1 -> Advent_of_code.Day6.solve
   | 6, 2 -> Advent_of_code.Day6.solve2
   | 7, 1 -> Advent_of_code.Day7.solve
+  | 7, 2 -> Advent_of_code.Day7.solve2
   | _ -> fun _ -> "N/A"
 
 let answer = solver data
