@@ -60,3 +60,26 @@ let solve input_data =
   let c1, c2, c3 = top3 component_counts in
   let ans = c1 * c2 * c3 in
   string_of_int ans
+
+let solve2 input_data =
+  let lines = splitlines input_data in
+  let positions = List.map parse_row lines in
+  let idx = Array.init (List.length positions) (fun x -> x) in
+  let pairs = pos_pairs positions in
+  let dists = List.map (fun ((i, p1), (j, p2)) -> (i, j, dist p1 p2)) pairs in
+  let dists' =
+    List.sort (fun (_, _, d1) (_, _, d2) -> Stdlib.compare d1 d2) dists
+  in
+  let last_pair = ref (-1, -1) in
+  let maybe_connect (i, j, _) =
+    match find idx i = find idx j with
+    | true -> ()
+    | false ->
+        union idx i j;
+        last_pair := (i, j)
+  in
+  List.iter maybe_connect dists';
+  let l1, l2 = !last_pair in
+  let x1, _, _ = List.nth positions l1 in
+  let x2, _, _ = List.nth positions l2 in
+  string_of_int (x1 * x2)
